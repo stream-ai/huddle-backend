@@ -35,9 +35,7 @@ func NewFargateWithALBStack(scope constructs.Construct, id string, props *Fargat
 		MemoryLimitMiB: jsii.Number(512),
 		Cpu:            jsii.Number(256),
 		TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
-			Image: awsecs.ContainerImage_FromAsset(jsii.String("."), &awsecs.AssetImageProps{
-				File: jsii.String("app/Dockerfile"),
-			}),
+			Image: awsecs.ContainerImage_FromAsset(jsii.String("../service"), &awsecs.AssetImageProps{}),
 		},
 		PublicLoadBalancer: jsii.Bool(true),
 	})

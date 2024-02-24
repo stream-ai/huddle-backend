@@ -1,11 +1,12 @@
-module backend
+module gitlab.con/stream-ai/huddle/backend
 
-go 1.22
+go 1.22.0
 
 require (
-	github.com/aws/aws-cdk-go/awscdk/v2 v2.129.0
+	github.com/aws/aws-cdk-go/awscdk/v2 v2.130.0
 	github.com/aws/constructs-go/constructs/v10 v10.3.0
 	github.com/aws/jsii-runtime-go v1.94.0
+	github.com/stretchr/testify v1.8.4
 )
 
 require (
@@ -19,7 +20,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/yuin/goldmark v1.4.13 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/mod v0.14.0 // indirect

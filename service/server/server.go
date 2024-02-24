@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"backend/app/middleware/loggermw"
+	"gitlab.con/stream-ai/huddle/backend/service/middleware/loggermw"
 )
 
 func New(logger *slog.Logger) http.Handler {

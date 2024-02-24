@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"backend/app/server"
+	"gitlab.con/stream-ai/huddle/backend/service/server"
 )
 
 func main() {
