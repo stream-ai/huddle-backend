@@ -5,18 +5,23 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"gitlab.con/stream-ai/huddle/backend/service/server"
 )
 
 func TestIntegration(t *testing.T) {
 	// Start the server in a separate goroutine
 	go func() {
-		err := run(context.Background(), nil, nil)
+		logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+		slog.SetDefault(logger)
+		addr := fmt.Sprintf(":80")
+		err := server.Run(context.Background(), logger, addr)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error running server: %s\n", err)
 		}
