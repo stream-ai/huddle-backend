@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	DefaultServerPort = "8080"
+	DefaultServerPort = "80"
 
 	ErrProcessingOptions = fmt.Errorf("error processing options")
 
