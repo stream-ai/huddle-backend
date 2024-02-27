@@ -37,6 +37,10 @@ var EnvironmentMap map[string]awscdk.Environment = map[string]awscdk.Environment
 		Account: jsii.String("471112991101"),
 		Region:  jsii.String("us-east-1"),
 	},
+	"stream.core": {
+		Account: jsii.String("674085691192"),
+		Region:  jsii.String("us-east-1"),
+	},
 }
 
 type vpcAppStackProps struct {
