@@ -15,4 +15,5 @@ alias pj='npx projen'
 
 echo "alias ll='ls -laFh'" >> /home/vscode/.zshrc
 echo "alias pj='npx projen'" >> /home/vscode/.zshrc
+echo "alias gotest='while inotifywait -r -e close_write ./ ; do go test ./... -v -cover; done'" >> /home/vscode/.zshrc
 
