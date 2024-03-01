@@ -21,6 +21,7 @@ func main() {
 		nil,
 		256, // cpu
 		512, // memoryLimit
+		"jdibling.hudl.ai",
 	)
 
 	app.Synth(nil)

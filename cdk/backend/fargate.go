@@ -7,8 +7,10 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsecs"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsecspatterns"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awselasticloadbalancingv2"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
+	"gitlab.con/stream-ai/huddle/backend/cdk/shared"
 )
 
 type FargateConstruct interface {
@@ -33,11 +35,12 @@ func (f *fargateConstruct) HealthCheck() *awselasticloadbalancingv2.HealthCheck 
 func NewFargateConstruct(
 	// Common construct props
 	scope constructs.Construct,
-	id string,
+	id shared.ConstructId,
 	// Fargate construct props
 	memoryLimitMiB float64,
 	cpu float64,
 	vpc awsec2.IVpc,
+	domainZone awsroute53.IHostedZone,
 ) FargateConstruct {
 	name := func(in string) *string {
 		return jsii.String(fmt.Sprintf("%s/%s", in, id))
@@ -59,6 +62,8 @@ func NewFargateConstruct(
 		},
 		PublicLoadBalancer: jsii.Bool(true),
 		ListenerPort:       jsii.Number(trafficPort),
+		DomainName:         domainZone.ZoneName(),
+		DomainZone:         domainZone,
 	})
 	loadBalancedFargateService.TargetGroup().ConfigureHealthCheck(&awselasticloadbalancingv2.HealthCheck{
 		Port: jsii.String(fmt.Sprintf("%d", trafficPort)),

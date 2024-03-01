@@ -1,9 +1,15 @@
 package shared
 
+import (
+	"github.com/aws/aws-cdk-go/awscdk/v2"
+	"github.com/aws/jsii-runtime-go"
+)
+
 type Environment interface {
 	Account() string
 	Region() string
 	RoleArn() string
+	CDK() *awscdk.Environment
 }
 
 func NewEnvironment(account string, region string, roleArn string) Environment {
@@ -26,6 +32,13 @@ func (e environment) Region() string {
 
 func (e environment) RoleArn() string {
 	return e.roleArn
+}
+
+func (e environment) CDK() *awscdk.Environment {
+	return &awscdk.Environment{
+		Account: jsii.String(e.account),
+		Region:  jsii.String(e.region),
+	}
 }
 
 var EnvironmentMap map[string]Environment = map[string]Environment{

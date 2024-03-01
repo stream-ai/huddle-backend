@@ -42,17 +42,19 @@ func Test_Build(t *testing.T) {
 		backendEnv         shared.Environment
 		backendCpu         float64
 		backendMemoryLimit float64
+		backendDomainName  string
 	}
 
 	tests := []test{
 		{
 			// vpc props
-			vpcEnv:    nil,
+			vpcEnv:    shared.NewEnvironment("123456789012", "us-west-2", "arn:aws:iam::123456789012:role/+huddle.cdk"),
 			vpcMaxAzs: 2,
 			// backend props
-			backendEnv:         nil,
+			backendEnv:         shared.NewEnvironment("123456789012", "us-west-2", "arn:aws:iam::123456789012:role/+huddle.cdk"),
 			backendCpu:         256,
 			backendMemoryLimit: 512,
+			backendDomainName:  "test.example.com",
 		},
 	}
 
@@ -66,6 +68,7 @@ func Test_Build(t *testing.T) {
 			tc.backendEnv,
 			tc.backendCpu,
 			tc.backendMemoryLimit,
+			tc.backendDomainName,
 		)
 
 		// check the vpc stack

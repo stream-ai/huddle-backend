@@ -22,6 +22,7 @@ func Build(scope constructs.Construct,
 	backendEnv shared.Environment,
 	backendCpu float64,
 	backendMemoryLimit float64,
+	backendDomainName string,
 ) BuildReturn {
 	// stackTags() returns a map of tags for a stack, including the "cdk-stack" tag
 	stackTags := func(stackName string) map[string]*string {
@@ -52,6 +53,7 @@ func Build(scope constructs.Construct,
 		backendCpu,
 		backendMemoryLimit,
 		vpc,
+		backendDomainName,
 	)
 
 	return BuildReturn{vpcStack, backendStack}
