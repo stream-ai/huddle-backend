@@ -4,42 +4,18 @@ import (
 	"testing"
 
 	"github.com/aws/aws-cdk-go/awscdk/v2"
+	"github.com/aws/jsii-runtime-go"
 	"github.com/stretchr/testify/assert"
 	"gitlab.con/stream-ai/huddle/backend/cdk/appstacks"
-	"gitlab.con/stream-ai/huddle/backend/cdk/shared"
 )
 
-type mockEnvironment struct {
-	account string
-	region  string
-	roleArn string
-}
+func Test_Integrationm(t *testing.T) {
+	defer jsii.Close()
 
-func (e *mockEnvironment) Account() string {
-	return e.account
-}
-
-func (e *mockEnvironment) Region() string {
-	return e.region
-}
-
-func (e *mockEnvironment) RoleArn() string {
-	return e.roleArn
-}
-
-var mockEnv = mockEnvironment{
-	account: "123456789012",
-	region:  "us-west-2",
-	roleArn: "arn:aws:iam::123456789012:role/+huddle.cdk",
-}
-
-func Test_Build(t *testing.T) {
 	type test struct {
 		// vpc props
-		vpcEnv    shared.Environment
 		vpcMaxAzs float64
 		// backend props
-		backendEnv         shared.Environment
 		backendCpu         float64
 		backendMemoryLimit float64
 		backendDomainName  string
@@ -48,10 +24,8 @@ func Test_Build(t *testing.T) {
 	tests := []test{
 		{
 			// vpc props
-			vpcEnv:    shared.NewEnvironment("123456789012", "us-west-2", "arn:aws:iam::123456789012:role/+huddle.cdk"),
 			vpcMaxAzs: 2,
 			// backend props
-			backendEnv:         shared.NewEnvironment("123456789012", "us-west-2", "arn:aws:iam::123456789012:role/+huddle.cdk"),
 			backendCpu:         256,
 			backendMemoryLimit: 512,
 			backendDomainName:  "test.example.com",
@@ -61,11 +35,11 @@ func Test_Build(t *testing.T) {
 	for _, tc := range tests {
 		app := awscdk.NewApp(nil)
 
+		// get an environment from the current AWS profile
+
 		ret := appstacks.Build(app,
 			"jdibling",
-			tc.vpcEnv,
 			tc.vpcMaxAzs,
-			tc.backendEnv,
 			tc.backendCpu,
 			tc.backendMemoryLimit,
 			tc.backendDomainName,

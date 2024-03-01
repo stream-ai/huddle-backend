@@ -6,5 +6,9 @@
     "us-east-1d",
     "us-east-1e",
     "us-east-1f"
-  ]
+  ],
+  "hosted-zone:account=590184032693:domainName=jdibling.hudl.ai:region=us-east-1": {
+    "Id": "/hostedzone/Z03501631UPCNZ63JUNYJ",
+    "Name": "jdibling.hudl.ai."
+  }
 }

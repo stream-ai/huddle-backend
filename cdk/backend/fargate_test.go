@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsec2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53"
+	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
 	"github.com/stretchr/testify/assert"
 	"gitlab.con/stream-ai/huddle/backend/cdk/backend"
@@ -16,33 +17,48 @@ type mockVpcConstruct struct {
 	awsec2.IVpc
 }
 
+type mockZoneProvider struct {
+	domainName string
+	env        awscdk.Environment
+}
+
+func (z *mockZoneProvider) HostedZone(scope constructs.Construct, id shared.ResourceId) awsroute53.IHostedZone {
+	return awsroute53.NewHostedZone(scope, id.String(), &awsroute53.HostedZoneProps{
+		ZoneName: jsii.String(z.domainName),
+	})
+}
+
+var mockEnv = awscdk.Environment{
+	Account: jsii.String("123456789012"),
+	Region:  jsii.String("us-west-2"),
+}
+
 func TestNewFargateConstruct(t *testing.T) {
 	defer jsii.Close()
 
 	type test struct {
-		env    shared.Environment
-		memory float64
-		cpu    float64
-		domain string
+		memory       float64
+		cpu          float64
+		domain       string
+		zoneProvider backend.ZoneProvider
 	}
 
 	tests := []test{
 		{
-			env:    shared.NewEnvironment("123456789012", "us-west-2", "arn:aws:iam::123456789012:role/+huddle.cdk"),
-			memory: 1024,
-			cpu:    256,
-			domain: "test",
+			memory:       1024,
+			cpu:          256,
+			domain:       "test",
+			zoneProvider: &mockZoneProvider{"test", mockEnv},
 		},
 	}
 
 	for _, tc := range tests {
 		app := awscdk.NewApp(nil)
-		stack := awscdk.NewStack(app, jsii.String("stack"), &awscdk.StackProps{})
+		stack := awscdk.NewStack(app, jsii.String("stack"), &awscdk.StackProps{
+			Env: &mockEnv,
+		})
 		vpc := awsec2.NewVpc(stack, jsii.String("vpc"), &awsec2.VpcProps{
 			MaxAzs: jsii.Number(2),
-		})
-		domainZone := awsroute53.NewHostedZone(stack, jsii.String("zone"), &awsroute53.HostedZoneProps{
-			ZoneName: jsii.String(tc.domain),
 		})
 
 		// Create the FargateConstruct
@@ -50,7 +66,7 @@ func TestNewFargateConstruct(t *testing.T) {
 			tc.memory,
 			tc.cpu,
 			vpc,
-			domainZone,
+			tc.zoneProvider,
 		)
 
 		// Assert that the FargateConstruct is created correctly

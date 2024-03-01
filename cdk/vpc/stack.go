@@ -4,7 +4,6 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsec2"
 	"github.com/aws/constructs-go/constructs/v10"
-	"github.com/aws/jsii-runtime-go"
 	"gitlab.con/stream-ai/huddle/backend/cdk/shared"
 )
 
@@ -24,20 +23,19 @@ type Stack interface {
 
 func NewStack(
 	// Common Stack Properties
+	envProvider shared.EnvProvider,
 	scope constructs.Construct,
 	id shared.StackId,
 	tags map[string]*string,
 	// VPC Stack Properties
-	stackEnv shared.Environment,
 	maxAzs float64,
 ) Stack {
-	cdkStack := awscdk.NewStack(scope, jsii.String(string(id)), &awscdk.StackProps{
+	cdkStack := awscdk.NewStack(scope, id.String(), &awscdk.StackProps{
 		Tags: &tags,
+		Env:  envProvider.Env(),
 	})
 
-	vpcConstruct := NewVpcConstruct(cdkStack, "HuddleBackendVpc",
-		maxAzs,
-	)
+	vpcConstruct := NewVpcConstruct(cdkStack, id.Construct("Backend"), maxAzs)
 
 	return &stack{
 		// awscdk.Stack(stack),

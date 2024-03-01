@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsecs"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsecspatterns"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awselasticloadbalancingv2"
-	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
 	"gitlab.con/stream-ai/huddle/backend/cdk/shared"
@@ -40,12 +39,8 @@ func NewFargateConstruct(
 	memoryLimitMiB float64,
 	cpu float64,
 	vpc awsec2.IVpc,
-	domainZone awsroute53.IHostedZone,
+	zoneProvider ZoneProvider,
 ) FargateConstruct {
-	name := func(in string) *string {
-		return jsii.String(fmt.Sprintf("%s/%s", in, id))
-	}
-
 	trafficPort := 80
 
 	// Load Balanced Fargate Service
@@ -53,7 +48,9 @@ func NewFargateConstruct(
 		File: jsii.String("./service/Dockerfile"),
 	})
 
-	loadBalancedFargateService := awsecspatterns.NewApplicationLoadBalancedFargateService(scope, name("Service"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
+	domainZone := zoneProvider.HostedZone(scope, id.Resource("zone"))
+
+	loadBalancedFargateService := awsecspatterns.NewApplicationLoadBalancedFargateService(scope, id.Resource("service").String(), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
 		Vpc:            vpc,
 		MemoryLimitMiB: jsii.Number(memoryLimitMiB),
 		Cpu:            jsii.Number(cpu),

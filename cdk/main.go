@@ -14,14 +14,10 @@ func main() {
 	// Build app stacks
 	appstacks.Build(app,
 		"jdibling",
-		// vpc props
-		nil, // vpcEnv
-		2,   // maxAzs
-		// backend props
-		nil,
-		256, // cpu
-		512, // memoryLimit
-		"jdibling.hudl.ai",
+		2,                  // vpc.maxAzs
+		256,                // backend.cpu
+		512,                // backend.memoryLimit
+		"jdibling.hudl.ai", // backend.domainName
 	)
 
 	app.Synth(nil)

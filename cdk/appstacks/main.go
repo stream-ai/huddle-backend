@@ -16,10 +16,8 @@ type BuildReturn struct {
 func Build(scope constructs.Construct,
 	appEnvName string,
 	// vpc props
-	vpcEnv shared.Environment,
 	vpcMaxAzs float64,
 	// backend props
-	backendEnv shared.Environment,
 	backendCpu float64,
 	backendMemoryLimit float64,
 	backendDomainName string,
@@ -33,27 +31,27 @@ func Build(scope constructs.Construct,
 	}
 
 	stackId := func(stackName string) shared.StackId {
-		return shared.StackId(appEnvName + "-huddle-" + stackName)
+		return shared.StackId(appEnvName + shared.Sep + "huddle" + shared.Sep + stackName)
 	}
 
 	vpcStack := vpc.NewStack(
+		shared.NewDefaultEnvProvider(),
 		scope,
 		stackId("vpc"),
 		stackTags("vpc"),
-		vpcEnv,
 		vpcMaxAzs)
 
 	vpc := vpcStack.Vpc()
 
 	backendStack := backend.NewStack(
+		shared.NewDefaultEnvProvider(),
 		scope,
 		stackId("backend"),
 		stackTags("backend"),
-		backendEnv,
 		backendCpu,
 		backendMemoryLimit,
 		vpc,
-		backendDomainName,
+		backend.NewZoneLookupProvider(backendDomainName),
 	)
 
 	return BuildReturn{vpcStack, backendStack}
