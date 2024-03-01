@@ -24,11 +24,11 @@ func TestNewFargateConstruct(t *testing.T) {
 	log.Printf("stack: %+v", stack)
 
 	// Create the FargateConstruct
-	fargate := backend.NewFargateConstruct(stack, "test", &backend.FargateProps{
-		MemoryLimitMiB: 1024,
-		Cpu:            256,
-		Vpc:            vpc,
-	})
+	fargate := backend.NewFargateConstruct(stack, "test",
+		1024,
+		256,
+		vpc,
+	)
 
 	// Assert that the FargateConstruct is created correctly
 	if fargate == nil {

@@ -15,9 +15,9 @@ func TestVpcConstruct(t *testing.T) {
 	// app := awscdk.NewApp(nil)
 	stack := awscdk.NewStack(nil, nil, nil)
 
-	construct := vpc.NewVpcConstruct(stack, "TestStack", &vpc.VpcProps{
-		MaxAzs: 2,
-	})
+	construct := vpc.NewVpcConstruct(stack, "TestStack",
+		2,
+	)
 
 	template := assertions.Template_FromStack(stack, nil)
 	template.HasResourceProperties(jsii.String("AWS::EC2::VPC"), map[string]any{

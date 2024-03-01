@@ -5,46 +5,49 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsec2"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
+	"gitlab.con/stream-ai/huddle/backend/cdk/shared"
 )
 
-type BackendStackProps struct {
-	Env         awscdk.Environment
-	Tags        map[string]*string
-	Cpu         float64
-	MemoryLimit float64
-	Vpc         awsec2.IVpc
-}
-
-type backendStack struct {
+type stack struct {
 	fargateConstruct FargateConstruct
-	loadBalancerDNS  *string
 }
 
-func (b *backendStack) LoadBalancerDNS() *string {
-	return b.loadBalancerDNS
+func (b *stack) LoadBalancerDNS() *string {
+	return b.fargateConstruct.FargateService().LoadBalancer().LoadBalancerDnsName()
 }
 
-func (b *backendStack) FargateConstruct() constructs.Construct {
+func (b *stack) FargateConstruct() constructs.Construct {
 	return b.fargateConstruct
 }
 
-type BackendStack interface {
+type Stack interface {
 	FargateConstruct() constructs.Construct
 	LoadBalancerDNS() *string
 }
 
-func NewStack(scope constructs.Construct, id string, props *BackendStackProps) BackendStack {
-	stack := awscdk.NewStack(scope, &id, &awscdk.StackProps{
-		Tags: &props.Tags,
+func NewStack(
+	// Common Stack Properties
+	scope constructs.Construct,
+	id shared.StackId,
+	tags map[string]*string,
+	// Backend Stack Properties
+	stackEnv shared.Environment,
+	ecsCpu float64,
+	ecsMemoryLimit float64,
+	vpc awsec2.IVpc,
+) Stack {
+	// TODO: assume a cross-account role if `env` is not nil
+	cdkStack := awscdk.NewStack(scope, jsii.String(string(id)), &awscdk.StackProps{
+		Tags: &tags,
 	})
 
-	fargateConstruct := NewFargateConstruct(stack, "HuddleBackendService", &FargateProps{
-		MemoryLimitMiB: props.MemoryLimit,
-		Cpu:            props.Cpu,
-		Vpc:            props.Vpc,
-	})
+	fargateConstruct := NewFargateConstruct(cdkStack, string(id.Construct("Fargate")),
+		ecsMemoryLimit,
+		ecsCpu,
+		vpc,
+	)
 
-	awscdk.NewCfnOutput(stack, jsii.String("LoadBalancerDNS"), &awscdk.CfnOutputProps{Value: fargateConstruct.FargateService().LoadBalancer().LoadBalancerDnsName()})
+	awscdk.NewCfnOutput(cdkStack, id.CfnOutput("LoadBalancerDNS"), &awscdk.CfnOutputProps{Value: fargateConstruct.FargateService().LoadBalancer().LoadBalancerDnsName()})
 
-	return &backendStack{fargateConstruct, fargateConstruct.FargateService().LoadBalancer().LoadBalancerDnsName()}
+	return &stack{fargateConstruct}
 }

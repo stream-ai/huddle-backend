@@ -6,10 +6,6 @@ import (
 	"github.com/aws/jsii-runtime-go"
 )
 
-type VpcProps struct {
-	MaxAzs float64
-}
-
 type VpcConstruct interface {
 	constructs.Construct
 	Vpc() awsec2.IVpc
@@ -24,12 +20,18 @@ func (v *vpcConstruct) Vpc() awsec2.IVpc {
 	return *v.vpc
 }
 
-func NewVpcConstruct(scope constructs.Construct, id string, props *VpcProps) VpcConstruct {
+func NewVpcConstruct(
+	// Common construct props
+	scope constructs.Construct,
+	id string,
+	// VPC construct props
+	maxAzs float64,
+) VpcConstruct {
 	this := constructs.NewConstruct(scope, &id)
 
 	// Create VPC and Cluster
 	vpc := awsec2.NewVpc(this, jsii.String("HuddleBackendVpc"), &awsec2.VpcProps{
-		MaxAzs: jsii.Number(props.MaxAzs),
+		MaxAzs: jsii.Number(maxAzs),
 	})
 
 	return &vpcConstruct{this, &vpc}

@@ -11,12 +11,6 @@ import (
 	"github.com/aws/jsii-runtime-go"
 )
 
-type FargateProps struct {
-	MemoryLimitMiB float64
-	Cpu            float64
-	Vpc            awsec2.IVpc
-}
-
 type FargateConstruct interface {
 	constructs.Construct
 	FargateService() awsecspatterns.ApplicationLoadBalancedFargateService
@@ -36,7 +30,15 @@ func (f *fargateConstruct) HealthCheck() *awselasticloadbalancingv2.HealthCheck 
 	return f.fargateService.TargetGroup().HealthCheck()
 }
 
-func NewFargateConstruct(scope constructs.Construct, id string, props *FargateProps) FargateConstruct {
+func NewFargateConstruct(
+	// Common construct props
+	scope constructs.Construct,
+	id string,
+	// Fargate construct props
+	memoryLimitMiB float64,
+	cpu float64,
+	vpc awsec2.IVpc,
+) FargateConstruct {
 	name := func(in string) *string {
 		return jsii.String(fmt.Sprintf("%s/%s", in, id))
 	}
@@ -49,9 +51,9 @@ func NewFargateConstruct(scope constructs.Construct, id string, props *FargatePr
 	})
 
 	loadBalancedFargateService := awsecspatterns.NewApplicationLoadBalancedFargateService(scope, name("Service"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
-		Vpc:            props.Vpc,
-		MemoryLimitMiB: jsii.Number(props.MemoryLimitMiB),
-		Cpu:            jsii.Number(props.Cpu),
+		Vpc:            vpc,
+		MemoryLimitMiB: jsii.Number(memoryLimitMiB),
+		Cpu:            jsii.Number(cpu),
 		TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
 			Image: assetImage,
 		},

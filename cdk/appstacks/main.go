@@ -1,33 +1,27 @@
 package appstacks
 
 import (
-	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
 	"gitlab.con/stream-ai/huddle/backend/cdk/backend"
+	"gitlab.con/stream-ai/huddle/backend/cdk/shared"
 	"gitlab.con/stream-ai/huddle/backend/cdk/vpc"
 )
 
-type VpcProps struct {
-	Env   awscdk.Environment
-	MaxAz float64
-}
-
-type BackendProps struct {
-	Env         awscdk.Environment
-	Cpu         float64
-	MemoryLimit float64
-}
-
 type BuildReturn struct {
-	VpcStack     vpc.VpcStack
-	BackendStack backend.BackendStack
+	VpcStack     vpc.Stack
+	BackendStack backend.Stack
 }
 
 func Build(scope constructs.Construct,
 	appEnvName string,
-	vpcProps VpcProps,
-	backendProps BackendProps,
+	// vpc props
+	vpcEnv shared.Environment,
+	vpcMaxAzs float64,
+	// backend props
+	backendEnv shared.Environment,
+	backendCpu float64,
+	backendMemoryLimit float64,
 ) BuildReturn {
 	// stackTags() returns a map of tags for a stack, including the "cdk-stack" tag
 	stackTags := func(stackName string) map[string]*string {
@@ -37,25 +31,28 @@ func Build(scope constructs.Construct,
 		return tags
 	}
 
-	stackId := func(stackName string) string {
-		return appEnvName + "-huddle-" + stackName
+	stackId := func(stackName string) shared.StackId {
+		return shared.StackId(appEnvName + "-huddle-" + stackName)
 	}
 
-	vpcStack := vpc.NewStack(scope, stackId("vpc"), &vpc.VpcStackProps{
-		Env:    vpcProps.Env,
-		MaxAzs: vpcProps.MaxAz,
-		Tags:   stackTags("vpc"),
-	})
+	vpcStack := vpc.NewStack(
+		scope,
+		stackId("vpc"),
+		stackTags("vpc"),
+		vpcEnv,
+		vpcMaxAzs)
 
 	vpc := vpcStack.Vpc()
 
-	backendStack := backend.NewStack(scope, stackId("backend"), &backend.BackendStackProps{
-		Env:         backendProps.Env,
-		Tags:        stackTags("backend"),
-		Cpu:         backendProps.Cpu,
-		MemoryLimit: backendProps.MemoryLimit,
-		Vpc:         vpc,
-	})
+	backendStack := backend.NewStack(
+		scope,
+		stackId("backend"),
+		stackTags("backend"),
+		backendEnv,
+		backendCpu,
+		backendMemoryLimit,
+		vpc,
+	)
 
 	return BuildReturn{vpcStack, backendStack}
 }
