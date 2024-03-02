@@ -8,6 +8,8 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"os/exec"
+	"strings"
 	"testing"
 	"time"
 
@@ -20,7 +22,7 @@ func TestIntegration(t *testing.T) {
 	go func() {
 		logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 		slog.SetDefault(logger)
-		addr := fmt.Sprintf(":80")
+		addr := fmt.Sprintf(":8080")
 		err := server.Run(context.Background(), logger, addr)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error running server: %s\n", err)
@@ -32,7 +34,7 @@ func TestIntegration(t *testing.T) {
 
 	// path, expectedStatusCode, expectedBody
 	// Make a request to the server
-	resp, err := http.Get("http://localhost:80/healthz")
+	resp, err := http.Get("http://localhost:8080/healthz")
 	assert.NoError(t, err)
 	defer resp.Body.Close()
 	// Read the response body
@@ -43,4 +45,13 @@ func TestIntegration(t *testing.T) {
 	assert.Equal(t, "OK", string(body))
 	// Assert the response status code
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func RepoRoot() string {
+	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
+	output, err := cmd.Output()
+	if err != nil {
+		log.Fatalf("failed to determine repository root directory: %v", err)
+	}
+	return strings.TrimSpace(string(output))
 }

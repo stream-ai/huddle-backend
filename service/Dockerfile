@@ -25,8 +25,9 @@ RUN tree
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /workspace/huddle-backend ./service/
 
 FROM alpine:3.12
+ARG TRAFFIC_PORT
 COPY --from=builder /workspace/huddle-backend /app/huddle-backend
 ENTRYPOINT ["/app/huddle-backend"]
-EXPOSE 80
+EXPOSE ${TRAFFIC_PORT}
 WORKDIR /app
 

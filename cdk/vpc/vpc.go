@@ -31,7 +31,7 @@ func NewVpcConstruct(
 	this := constructs.NewConstruct(scope, id.String())
 
 	// Create VPC and Cluster
-	vpc := awsec2.NewVpc(this, id.Resource("Vpc").String(), &awsec2.VpcProps{
+	vpc := awsec2.NewVpc(this, id.Resource("vpc").String(), &awsec2.VpcProps{
 		MaxAzs: jsii.Number(maxAzs),
 	})
 

@@ -19,6 +19,8 @@ func Test_Integrationm(t *testing.T) {
 		backendCpu         float64
 		backendMemoryLimit float64
 		backendDomainName  string
+		backendTrafficPort int
+		backendCertArn     string
 	}
 
 	tests := []test{
@@ -29,6 +31,8 @@ func Test_Integrationm(t *testing.T) {
 			backendCpu:         256,
 			backendMemoryLimit: 512,
 			backendDomainName:  "test.example.com",
+			backendTrafficPort: 8080,
+			backendCertArn:     "arn:aws:acm:us-west-2:123456789012:certificate/12345678-1234-1234-1234-123456789012",
 		},
 	}
 
@@ -43,6 +47,7 @@ func Test_Integrationm(t *testing.T) {
 			tc.backendCpu,
 			tc.backendMemoryLimit,
 			tc.backendDomainName,
+			tc.backendCertArn,
 		)
 
 		// check the vpc stack

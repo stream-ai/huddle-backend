@@ -18,6 +18,7 @@ func main() {
 		256,                // backend.cpu
 		512,                // backend.memoryLimit
 		"jdibling.hudl.ai", // backend.domainName
+		"arn:aws:acm:us-east-1:590184032693:certificate/68789120-b333-423e-bd3a-2573a95b534d", // backend.certArn
 	)
 
 	app.Synth(nil)

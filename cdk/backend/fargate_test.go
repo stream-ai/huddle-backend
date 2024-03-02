@@ -5,8 +5,6 @@ import (
 
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsec2"
-	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53"
-	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
 	"github.com/stretchr/testify/assert"
 	"gitlab.con/stream-ai/huddle/backend/cdk/backend"
@@ -15,17 +13,6 @@ import (
 
 type mockVpcConstruct struct {
 	awsec2.IVpc
-}
-
-type mockZoneProvider struct {
-	domainName string
-	env        awscdk.Environment
-}
-
-func (z *mockZoneProvider) HostedZone(scope constructs.Construct, id shared.ResourceId) awsroute53.IHostedZone {
-	return awsroute53.NewHostedZone(scope, id.String(), &awsroute53.HostedZoneProps{
-		ZoneName: jsii.String(z.domainName),
-	})
 }
 
 var mockEnv = awscdk.Environment{
@@ -40,7 +27,8 @@ func TestNewFargateConstruct(t *testing.T) {
 		memory       float64
 		cpu          float64
 		domain       string
-		zoneProvider backend.ZoneProvider
+		zoneProvider shared.ZoneProvider
+		certProvider shared.CertificateProvider
 	}
 
 	tests := []test{
@@ -48,16 +36,20 @@ func TestNewFargateConstruct(t *testing.T) {
 			memory:       1024,
 			cpu:          256,
 			domain:       "test",
-			zoneProvider: &mockZoneProvider{"test", mockEnv},
+			zoneProvider: shared.NewMockZoneProvider("test", mockEnv),
+			certProvider: shared.NewMockCertificateProvider("example.com", jsii.Strings("api.example.com")),
 		},
 	}
 
 	for _, tc := range tests {
 		app := awscdk.NewApp(nil)
-		stack := awscdk.NewStack(app, jsii.String("stack"), &awscdk.StackProps{
+		stackId := shared.StackId("testStack")
+		stack := awscdk.NewStack(app, stackId.String(), &awscdk.StackProps{
 			Env: &mockEnv,
 		})
-		vpc := awsec2.NewVpc(stack, jsii.String("vpc"), &awsec2.VpcProps{
+
+		constructId := stackId.Construct("network")
+		vpc := awsec2.NewVpc(stack, constructId.Resource("vpc").String(), &awsec2.VpcProps{
 			MaxAzs: jsii.Number(2),
 		})
 
@@ -67,6 +59,7 @@ func TestNewFargateConstruct(t *testing.T) {
 			tc.cpu,
 			vpc,
 			tc.zoneProvider,
+			tc.certProvider,
 		)
 
 		// Assert that the FargateConstruct is created correctly

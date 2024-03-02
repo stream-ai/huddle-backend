@@ -35,7 +35,7 @@ func NewStack(
 		Env:  envProvider.Env(),
 	})
 
-	vpcConstruct := NewVpcConstruct(cdkStack, id.Construct("Backend"), maxAzs)
+	vpcConstruct := NewVpcConstruct(cdkStack, id.Construct("backend"), maxAzs)
 
 	return &stack{
 		// awscdk.Stack(stack),

@@ -1,6 +1,10 @@
 package shared
 
-import "github.com/aws/jsii-runtime-go"
+import (
+	"strings"
+
+	"github.com/aws/jsii-runtime-go"
+)
 
 type (
 	StackId     string
@@ -10,8 +14,24 @@ type (
 
 const Sep = "-"
 
+type StringPointer interface {
+	String() *string
+}
+
+type StringPather interface {
+	Path() *string
+}
+
+func fmtPath(sp StringPointer) *string {
+	return jsii.String("/" + strings.ReplaceAll(*sp.String(), Sep, "/"))
+}
+
 func (s StackId) String() *string {
 	return jsii.String(string(s))
+}
+
+func (s StackId) Path() *string {
+	return fmtPath(&s)
 }
 
 func (s StackId) Construct(id string) ConstructId {
@@ -26,10 +46,18 @@ func (c ConstructId) String() *string {
 	return jsii.String(string(c))
 }
 
+func (c ConstructId) Path() *string {
+	return fmtPath(&c)
+}
+
 func (c ConstructId) Resource(id string) ResourceId {
 	return ResourceId(*c.String() + Sep + id)
 }
 
 func (r ResourceId) String() *string {
 	return jsii.String(string(r))
+}
+
+func (r ResourceId) Path() *string {
+	return fmtPath(&r)
 }

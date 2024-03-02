@@ -2,7 +2,7 @@
 	"name": "huddle/docker",
 	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 	"postCreateCommand": "ls -lah && ./.devcontainer/post-create.sh",
-	"forwardPorts": [80],
+	"forwardPorts": [80, 8080, 443],
 	"features": {
 		"ghcr.io/devcontainers/features/go:1": {
 			"version": "1.22"

@@ -6,9 +6,4 @@ import (
 
 func main() {
 	cmd.Execute()
-
-	// if err := run(ctx, logger, os.Args); err != nil {
-	// 	logger.Error(err.Error())
-	// 	os.Exit(1)
-	// }
 }
